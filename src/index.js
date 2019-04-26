@@ -1,8 +1,15 @@
 import * as Discord from "discord.js";
 import Config from "./config";
 import CommandLoader from "./loader";
+import Message from "./imessage/models/Message";
+import imPlugin from "./imessage";
+import Enmap from "enmap";
 
 const client = new Discord.Client();
+
+client.imsgSubscribedGuilds = new Enmap({ name: "imsgSubscribedGuilds" });
+client.imsgSelectedChannels = new Enmap({ name: "imsgSelectedChannels" });
+
 const commands = CommandLoader.loadCommands();
 
 const initCommands = async () => {
@@ -15,6 +22,8 @@ const initCommands = async () => {
 client.on("ready", async () => {
   await initCommands();
   console.log(`Logged in as ${client.user.tag}!`);
+
+  imPlugin.init();
 
   setInterval(() => {
     const beforeDarkChannel = client.channels.get(beforeDarkId);
@@ -42,6 +51,25 @@ client.on("ready", async () => {
 });
 
 client.on("message", msg => {
+  console.log(client.imsgSubscribedGuilds, msg.guild.id);
+
+  if (client.imsgSubscribedGuilds.get(msg.guild.id) != null) {
+    const people = client.imsgSubscribedGuilds.get(msg.guild.id);
+    console.log(people);
+    people.map(id => {
+      if (msg.content.indexOf(id) != 0) {
+        Message.sendMessageToRecipient(
+          {
+            id: id
+          },
+          `${msg.guild.name} (#${msg.channel.name}): ${
+            msg.member.user.username
+          }: ${msg.content}`
+        );
+      }
+    });
+  }
+
   if (msg.content[0] == Config.getPrefix()) {
     const messageArr = msg.content.substring(1).split(" ");
     const command = commands[messageArr[0].toLocaleLowerCase()];
@@ -99,3 +127,7 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
 });
 
 client.login(Config.getToken());
+
+console.log(imPlugin);
+
+Message.client = client;
