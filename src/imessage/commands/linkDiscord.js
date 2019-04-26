@@ -2,7 +2,10 @@ import Command from "../../command";
 
 class LinkDiscord extends Command {
   constructor() {
-    super("linkdiscord", "Links your phone number to your Discord account");
+    super(
+      "linkdiscord",
+      "Links your phone number to your Discord account (UNDER CONSTRUCTION)"
+    );
   }
 
   onMessage(message) {
@@ -39,7 +42,7 @@ class LinkDiscord extends Command {
 
               if (reaction.emoji.name === "👍") {
                 discordMessage.edit(
-                  "iMessage account linked to Discord successfully"
+                  "iMessage account linked to Discord successfully (hah sike, this doesn't actually work yet)"
                 );
               } else {
                 discordMessage.edit("iMessage account link rejected");

@@ -2,6 +2,7 @@ import iMessage from "imessage";
 import Config from "../config";
 import Message from "./models/Message";
 import CommandLoader from "./loader";
+import * as Discord from "discord.js";
 
 const im = new iMessage();
 
@@ -83,6 +84,7 @@ var prevRowId = -1;
 
 const handleCommand = message => {
   const recipient = message.getRecipient();
+  const client = message.getDiscordClient();
   var command = message.getContent();
   if (command[0] == Config.getPrefix()) {
     const messageArr = command.substring(1).split(" ");
@@ -93,20 +95,27 @@ const handleCommand = message => {
       command.onMessage(message);
     }
   } else {
-    message.getDiscordClient().imsgUserData.ensure(message.getRecipientId(), {
+    client.imsgUserData.ensure(message.getRecipientId(), {
       channel: ""
     });
-    const channel = message
-      .getDiscordClient()
-      .channels.find(
-        channel =>
-          channel.id ==
-          message
-            .getDiscordClient()
-            .imsgUserData.get(message.getRecipientId(), "channel")
-      );
+    const channel = client.channels.find(
+      channel =>
+        channel.id ==
+        client.imsgUserData.get(message.getRecipientId(), "channel")
+    );
     if (channel) {
-      channel.send(`${message.getRecipientId()}: ${message.content}`);
+      const botMember = channel.guild.members.find(
+        member => member.id == client.user.id
+      );
+      console.log(botMember);
+      const embed = new Discord.RichEmbed()
+        .setAuthor(message.getRecipientId(), "https://i.imgur.com/lm8s41J.png")
+        /*
+         * Alternatively, use "#00AE86", [0, 174, 134] or an integer number.
+         */
+        .setColor(0x00ae86)
+        .setDescription(message.content);
+      channel.send({ embed });
     }
   }
 };

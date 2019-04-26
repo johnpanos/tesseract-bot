@@ -51,6 +51,7 @@ client.on("ready", async () => {
 });
 
 client.on("message", msg => {
+  if (msg.author.id === client.user.id) return;
   // send from a guild
   if (msg.guild) {
     const people = client.imsgUserData.indexes.filter(index => {
