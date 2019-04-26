@@ -4,11 +4,19 @@ import Message from "./models/Message";
 
 const im = new iMessage();
 
-var prevRowId = 0;
+var prevRowId = -1;
 
 var subscribedGuilds = {};
 
 const commands = {
+  debug(message) {
+    message.sendMessage(`
+${message.getRecipientId()}
+
+Current Guild: ${message.getUserData().guild}
+    `);
+  },
+
   listguilds(message) {
     const client = message.getDiscordClient();
     console.log(client.guilds);
@@ -120,7 +128,7 @@ const commands = {
         channel => channel.id == message.content.split(" ")[1]
       )) != null
     ) {
-      client.imsgSelectedChannels.set(
+      client.imsgUserData.set(
         message.getRecipientId(),
         channel.id,
         "channel"
@@ -132,6 +140,39 @@ const commands = {
       );
     } else {
       message.sendMessage("Channel not found.");
+    }
+  },
+
+  setguild(message) {
+    const client = message.getDiscordClient();
+
+    var payload = message.content.split(" ");
+    payload.shift();
+    payload = payload.join(" ");
+
+    const guildFromId = client.guilds.find(guild => guild.id == payload);
+    const guildFromName = client.guilds.find(
+      guild => guild.name.toLocaleLowerCase() == payload.toLocaleLowerCase()
+    );
+
+    if (guildFromId != null || guildFromName != null) {
+      const guild = guildFromId || guildFromName;
+
+      client.imsgUserData.ensure(message.getRecipientId(), {
+        guild: null
+      });
+
+      if (
+        client.imsgUserData
+          .get(message.getRecipientId(), "guild") == guild.id
+      ) {
+        message.sendMessage(`Your current guild is already set to "${guild.name}"`);
+      } else {
+        client.imsgUserData.set(message.getRecipientId(), guild.id, 'guild');
+        message.sendMessage(`Currnet guild set to "${guild.name}"`);
+      }
+    } else {
+      message.sendMessage(`No guild found with name or id: "${payload}"`);
     }
   }
 };
@@ -147,10 +188,11 @@ const handleCommand = message => {
       commands[command](message);
     }
   } else {
-    console.log(
-      message
-        .getDiscordClient()
-        .imsgSelectedChannels.get(message.getRecipientId(), "channel")
+    message.getDiscordClient().imsgUserData.ensure(
+      message.getRecipientId(),
+      {
+        channel: ''
+      }
     );
     const channel = message
       .getDiscordClient()
@@ -159,7 +201,7 @@ const handleCommand = message => {
           channel.id ==
           message
             .getDiscordClient()
-            .imsgSelectedChannels.get(message.getRecipientId(), "channel")
+            .imsgUserData.get(message.getRecipientId(), "channel")
       );
     console.log(channel);
     if (channel) {
@@ -178,6 +220,10 @@ var imMessage = {
         db.get(query, (err, row) => {
           if (err) {
             console.error("ah shit, here we go again.", err);
+          }
+          if (prevRowId == -1) {
+            prevRowId = row.ROWID;
+            return;
           }
           if (prevRowId != row.ROWID) {
             console.log("New message found!");

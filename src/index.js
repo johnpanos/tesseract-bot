@@ -8,7 +8,7 @@ import Enmap from "enmap";
 const client = new Discord.Client();
 
 client.imsgSubscribedGuilds = new Enmap({ name: "imsgSubscribedGuilds" });
-client.imsgSelectedChannels = new Enmap({ name: "imsgSelectedChannels" });
+client.imsgUserData = new Enmap({ name: "imsgUserData" });
 
 const commands = CommandLoader.loadCommands();
 

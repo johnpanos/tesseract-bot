@@ -35,6 +35,10 @@ class Message {
     Message.sendMessageToRecipient(this.recipient, text);
   }
 
+  getUserData() {
+    return this.getDiscordClient().imsgUserData.get(this.getRecipientId());
+  }
+
   getDiscordClient() {
     return Message.client;
   }
