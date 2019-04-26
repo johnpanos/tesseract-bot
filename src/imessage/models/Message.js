@@ -27,7 +27,7 @@ class Message {
     });
 
     child.on("close", code => {
-      console.log(`child process exited with code ${code}`);
+      console.log(`OSAScript exited with code: ${code}`);
     });
   }
 
@@ -37,6 +37,26 @@ class Message {
 
   getUserData() {
     return this.getDiscordClient().imsgUserData.get(this.getRecipientId());
+  }
+
+  getCurrentGuild() {
+    this.getDiscordClient().imsgUserData.ensure(this.getRecipientId(), {
+      guild: null
+    });
+    return this.getDiscordClient().imsgUserData.get(
+      this.getRecipientId(),
+      "guild"
+    );
+  }
+
+  getCurrentChannel() {
+    this.getDiscordClient().imsgUserData.ensure(this.getRecipientId(), {
+      channel: null
+    });
+    return this.getDiscordClient().imsgUserData.get(
+      this.getRecipientId(),
+      "channel"
+    );
   }
 
   getDiscordClient() {

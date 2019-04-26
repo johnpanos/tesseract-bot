@@ -51,30 +51,32 @@ client.on("ready", async () => {
 });
 
 client.on("message", msg => {
-  console.log(client.imsgSubscribedGuilds, msg.guild.id);
+  // send from a guild
+  if (msg.guild) {
+    console.log(client.imsgSubscribedGuilds, msg.guild.id);
+    if (client.imsgSubscribedGuilds.get(msg.guild.id) != null) {
+      const people = client.imsgSubscribedGuilds.get(msg.guild.id);
+      console.log(people);
+      people.map(id => {
+        if (msg.content.indexOf(id) != 0) {
+          Message.sendMessageToRecipient(
+            {
+              id: id
+            },
+            `${msg.guild.name} (#${msg.channel.name}): ${
+              msg.member.user.username
+            }: ${msg.content}`
+          );
+        }
+      });
+    }
 
-  if (client.imsgSubscribedGuilds.get(msg.guild.id) != null) {
-    const people = client.imsgSubscribedGuilds.get(msg.guild.id);
-    console.log(people);
-    people.map(id => {
-      if (msg.content.indexOf(id) != 0) {
-        Message.sendMessageToRecipient(
-          {
-            id: id
-          },
-          `${msg.guild.name} (#${msg.channel.name}): ${
-            msg.member.user.username
-          }: ${msg.content}`
-        );
+    if (msg.content[0] == Config.getPrefix()) {
+      const messageArr = msg.content.substring(1).split(" ");
+      const command = commands[messageArr[0].toLocaleLowerCase()];
+      if (command) {
+        command.onMessage(msg);
       }
-    });
-  }
-
-  if (msg.content[0] == Config.getPrefix()) {
-    const messageArr = msg.content.substring(1).split(" ");
-    const command = commands[messageArr[0].toLocaleLowerCase()];
-    if (command) {
-      command.onMessage(msg);
     }
   }
 });
