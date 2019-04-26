@@ -6,7 +6,7 @@ module.exports = {
     require("fs")
       .readdirSync(normalizedPath)
       .forEach(function(file) {
-        const command = require("./commands/" + file).default;
+        const command = require(normalizedPath + "/" + file).default;
         commands[command.getCommand()] = command;
       });
     return commands;

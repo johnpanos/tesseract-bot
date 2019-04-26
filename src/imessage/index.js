@@ -105,7 +105,6 @@ const handleCommand = message => {
             .getDiscordClient()
             .imsgUserData.get(message.getRecipientId(), "channel")
       );
-    console.log(channel);
     if (channel) {
       channel.send(`${message.getRecipientId()}: ${message.content}`);
     }

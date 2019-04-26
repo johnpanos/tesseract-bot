@@ -2,7 +2,7 @@ import Command from "../../command";
 
 class Debug extends Command {
   constructor() {
-    super("debug", "Prints out debug information to the console");
+    super("debug", "Prints out debug/user information to the text thread");
   }
 
   onMessage(message) {

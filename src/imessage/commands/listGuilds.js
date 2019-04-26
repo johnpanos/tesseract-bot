@@ -7,13 +7,11 @@ class ListGuilds extends Command {
 
   onMessage(message) {
     const client = message.getDiscordClient();
-    console.log(client.guilds);
     const guildString = client.guilds
       .map(guilds => {
         return guilds.name + ": " + guilds.id;
       })
-      .join("\n");
-    console.log(guildString);
+      .join("\n\n");
     message.sendMessage(guildString);
   }
 }

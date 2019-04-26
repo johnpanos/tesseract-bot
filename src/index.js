@@ -53,10 +53,10 @@ client.on("ready", async () => {
 client.on("message", msg => {
   // send from a guild
   if (msg.guild) {
-    console.log(client.imsgSubscribedGuilds, msg.guild.id);
-    if (client.imsgSubscribedGuilds.get(msg.guild.id) != null) {
-      const people = client.imsgSubscribedGuilds.get(msg.guild.id);
-      console.log(people);
+    const people = client.imsgUserData.indexes.filter(index => {
+      return client.imsgUserData.get(index, "channel") == msg.channel.id;
+    });
+    if (people.length > 0) {
       people.map(id => {
         if (msg.content.indexOf(id) != 0) {
           Message.sendMessageToRecipient(
