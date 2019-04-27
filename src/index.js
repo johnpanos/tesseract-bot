@@ -9,6 +9,7 @@ const client = new Discord.Client();
 
 client.imsgSubscribedGuilds = new Enmap({ name: "imsgSubscribedGuilds" });
 client.imsgUserData = new Enmap({ name: "imsgUserData" });
+client.imsgDiscordLink = new Enmap({ name: "imsgDiscordLink" });
 
 const commands = CommandLoader.loadCommands();
 

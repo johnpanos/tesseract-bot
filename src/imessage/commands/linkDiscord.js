@@ -20,6 +20,20 @@ class LinkDiscord extends Command {
       return;
     }
 
+    client.imsgDiscordLink.ensure(user.id, {
+      user: user.id,
+      imsgAccounts: []
+    });
+
+    if (
+      client.imsgDiscordLink
+        .get(user.id)
+        .imsgAccounts.find(acc => acc == message.getRecipientId()) != null
+    ) {
+      message.sendMessage("Discord account already linked");
+      return;
+    }
+
     user.createDM().then(dmChannel => {
       dmChannel
         .send(
@@ -42,21 +56,26 @@ class LinkDiscord extends Command {
 
               if (reaction.emoji.name === "👍") {
                 discordMessage.edit(
-                  "iMessage account linked to Discord successfully (hah sike, this doesn't actually work yet)"
+                  "iMessage account linked to Discord successfully"
+                );
+
+                client.imsgDiscordLink.push(
+                  user.id,
+                  message.getRecipientId(),
+                  "imsgAccounts"
                 );
               } else {
                 discordMessage.edit("iMessage account link rejected");
               }
             })
             .catch(collected => {
+              console.log(collected);
               discordMessage.reply(
                 "The iMessage account link request has expired"
               );
             });
         });
     });
-
-    message.sendMessage("Bruh");
   }
 }
 

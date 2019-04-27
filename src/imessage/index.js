@@ -82,7 +82,7 @@ var prevRowId = -1;
 //   },
 // };
 
-const handleCommand = message => {
+const handleCommand = async message => {
   const recipient = message.getRecipient();
   const client = message.getDiscordClient();
   var command = message.getContent();
@@ -107,9 +107,24 @@ const handleCommand = message => {
       const botMember = channel.guild.members.find(
         member => member.id == client.user.id
       );
-      console.log(botMember);
+
+      const acc = client.imsgDiscordLink.find(accounts =>
+        accounts.imsgAccounts.find(acc => acc == message.getRecipientId())
+      );
+
+      const discordAcc = await client.fetchUser(acc.user);
+
+      console.log(discordAcc);
+
       const embed = new Discord.RichEmbed()
-        .setAuthor(message.getRecipientId(), "https://i.imgur.com/lm8s41J.png")
+        .setAuthor(
+          discordAcc
+            ? discordAcc.username + "#" + discordAcc.discriminator
+            : message.getRecipientId(),
+          discordAcc.avatarURL
+            ? discordAcc.avatarURL
+            : "https://i.imgur.com/lm8s41J.png"
+        )
         /*
          * Alternatively, use "#00AE86", [0, 174, 134] or an integer number.
          */
